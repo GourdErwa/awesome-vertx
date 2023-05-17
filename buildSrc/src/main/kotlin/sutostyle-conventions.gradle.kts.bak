@@ -1,0 +1,43 @@
+import org.apache.tools.ant.taskdefs.condition.Os
+import org.gradle.kotlin.dsl.version
+
+plugins {
+    id("com.github.autostyle") version "3.2"
+}
+
+autostyle {
+    kotlinGradle {
+        ktlint()
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+    // TODO: the task fails on Windows as follows:
+    // Cannot fingerprint input file property 'sourceFiles': Could not stat file D:\a\pgjdbc\pgjdbc\benchmarks\**\*.md
+    if (!Os.isFamily(Os.FAMILY_WINDOWS)) {
+        format("markdown") {
+            target("**/*.md")
+            endWithNewline()
+        }
+    }
+}
+
+plugins.withId("java") {
+    autostyle {
+        java {
+            // targetExclude("**/test/java/*.java")
+            // TODO: implement license check (with copyright year)
+            // licenseHeaderFile(licenseHeaderFile)
+            importOrder(
+                "static ",
+                "com.hoteamsoft.",
+                "",
+                "java.",
+                "javax."
+            )
+            removeUnusedImports()
+            trimTrailingWhitespace()
+            indentWithSpaces(4)
+            endWithNewline()
+        }
+    }
+}
